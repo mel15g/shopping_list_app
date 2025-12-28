@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/list_screen.dart';
+import 'screens/home_screen.dart';
+
 
 void main() {
   runApp(const ShoppingListApp());
@@ -16,7 +18,7 @@ class ShoppingListApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.teal,
       ),
-      home: const ListScreen(),
+      home: const HomeScreen(),
     );
   }
 }
