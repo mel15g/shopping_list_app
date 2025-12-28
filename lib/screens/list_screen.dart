@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/list_entry.dart';
+import 'add_item_screen.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({super.key});
@@ -29,12 +30,30 @@ class _ListScreenState extends State<ListScreen> {
     });
   }
 
+  Future<void> _openAddItemScreen() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AddItemScreen()),
+    );
+
+    if (result == null) return;
+
+    setState(() {
+      _entries.add(
+        ListEntry(
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+          title: result['title'] as String,
+          quantity: result['quantity'] as int,
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _entries.isEmpty
           ? const Center(
-              child: Text('Noch keine Artikel. Tippe später auf +'),
+              child: Text('Noch keine Artikel. Tippe auf +'),
             )
           : ListView.builder(
               itemCount: _entries.length,
@@ -49,8 +68,7 @@ class _ListScreenState extends State<ListScreen> {
                   title: Text(
                     '${e.title} (${e.quantity}x)',
                     style: TextStyle(
-                      decoration:
-                          e.isDone ? TextDecoration.lineThrough : null,
+                      decoration: e.isDone ? TextDecoration.lineThrough : null,
                     ),
                   ),
                   trailing: IconButton(
@@ -60,6 +78,10 @@ class _ListScreenState extends State<ListScreen> {
                 );
               },
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddItemScreen,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
