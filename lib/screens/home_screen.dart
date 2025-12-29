@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/list_entry.dart';
-import 'list_screen.dart';
 import 'add_item_screen.dart';
+import 'list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,9 +26,25 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _toggleFavorite(String id) {
+    setState(() {
+      final idx = _entries.indexWhere((e) => e.id == id);
+      _entries[idx] =
+          _entries[idx].copyWith(isFavorite: !_entries[idx].isFavorite);
+    });
+  }
+
   void _removeEntry(String id) {
     setState(() {
       _entries.removeWhere((e) => e.id == id);
+    });
+  }
+
+  void _moveToOpen(String id) {
+    setState(() {
+      final idx = _entries.indexWhere((e) => e.id == id);
+      _entries[idx] = _entries[idx].copyWith(isDone: false);
+      _index = 0; // optional: springt direkt auf "Offen"
     });
   }
 
@@ -54,33 +70,37 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final openItems = _entries.where((e) => !e.isDone).toList();
     final doneItems = _entries.where((e) => e.isDone).toList();
+    final favoriteItems = _entries.where((e) => e.isFavorite).toList();
 
-    final title = _index == 0 ? 'Offen' : 'Erledigt';
-    final shownItems = _index == 0 ? openItems : doneItems;
+    final title = switch (_index) {
+      0 => 'Offen',
+      1 => 'Erledigt',
+      _ => 'Favoriten',
+    };
+
+    final shownItems = switch (_index) {
+      0 => openItems,
+      1 => doneItems,
+      _ => favoriteItems,
+    };
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-
-      appBar: AppBar(
-        title: Text(title),
-        centerTitle: true,
-      ),
-
+      appBar: AppBar(title: Text(title)),
       body: ListScreen(
         entries: shownItems,
         onToggleDone: _toggleDone,
         onRemove: _removeEntry,
+        onToggleFavorite: _toggleFavorite,
+        showMoveToOpen: _index == 2, // nur im Favoriten-Tab
+        onMoveToOpen: _index == 2 ? _moveToOpen : null,
       ),
-
       floatingActionButton: _index == 0
           ? FloatingActionButton(
               onPressed: _openAddItem,
               child: const Icon(Icons.add),
             )
           : null,
-
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
         items: const [
@@ -91,6 +111,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.check_circle_outline),
             label: 'Erledigt',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star_outline),
+            label: 'Favoriten',
           ),
         ],
       ),
