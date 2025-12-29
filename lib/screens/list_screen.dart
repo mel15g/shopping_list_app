@@ -20,7 +20,7 @@ class ListScreen extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Text(
-            'Keine Einträge in dieser Ansicht.\nTippe unten auf + um etwas hinzuzufügen.',
+            'Keine Einträge in dieser Ansicht.\nTippe auf + um etwas hinzuzufügen.',
             textAlign: TextAlign.center,
           ),
         ),
@@ -28,34 +28,69 @@ class ListScreen extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(top: 8, bottom: 80),
+      padding: const EdgeInsets.only(top: 12, bottom: 90),
       itemCount: entries.length,
       itemBuilder: (context, i) {
         final e = entries[i];
 
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          elevation: 1,
-          child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            leading: Checkbox(
-              value: e.isDone,
-              onChanged: (_) => onToggleDone(e.id),
-            ),
-            title: Text(
-              e.title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                decoration: e.isDone ? TextDecoration.lineThrough : null,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Material(
+            borderRadius: BorderRadius.circular(16),
+            elevation: 1,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => onToggleDone(e.id), // Tippen toggelt auch
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: e.isDone,
+                      onChanged: (_) => onToggleDone(e.id),
+                    ),
+                    const SizedBox(width: 6),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            e.title,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              decoration:
+                                  e.isDone ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              Chip(
+                                label: Text('Menge: ${e.quantity}'),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              Chip(
+                                label: Text(e.isDone ? 'Erledigt' : 'Offen'),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    IconButton(
+                      tooltip: 'Löschen',
+                      onPressed: () => onRemove(e.id),
+                      icon: const Icon(Icons.delete_outline),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            subtitle: Text('Menge: ${e.quantity}'),
-            trailing: IconButton(
-              tooltip: 'Löschen',
-              onPressed: () => onRemove(e.id),
-              icon: const Icon(Icons.delete_outline),
             ),
           ),
         );
