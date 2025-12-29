@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/list_entry.dart';
 import 'add_item_screen.dart';
 import 'list_screen.dart';
+import 'detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -66,6 +67,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _openDetails(ListEntry entry) async {
+    final updated = await Navigator.of(context).push<ListEntry>(
+      MaterialPageRoute(builder: (_) => DetailScreen(entry: entry)),
+    );
+
+    if (updated == null) return;
+
+    setState(() {
+      final idx = _entries.indexWhere((e) => e.id == updated.id);
+      if (idx != -1) _entries[idx] = updated;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final openItems = _entries.where((e) => !e.isDone).toList();
@@ -91,6 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onToggleDone: _toggleDone,
         onRemove: _removeEntry,
         onToggleFavorite: _toggleFavorite,
+        onOpenDetails: _openDetails,
         showMoveToOpen: _index == 2, // nur im Favoriten-Tab
         onMoveToOpen: _index == 2 ? _moveToOpen : null,
       ),

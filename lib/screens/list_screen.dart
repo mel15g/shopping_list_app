@@ -6,8 +6,8 @@ class ListScreen extends StatelessWidget {
   final void Function(String id) onToggleDone;
   final void Function(String id) onRemove;
   final void Function(String id) onToggleFavorite;
+  final void Function(ListEntry entry) onOpenDetails;
 
-  /// optional: wenn gesetzt, wird statt "Löschen" ein anderes Icon/Action gezeigt
   final bool showMoveToOpen;
   final void Function(String id)? onMoveToOpen;
 
@@ -17,6 +17,7 @@ class ListScreen extends StatelessWidget {
     required this.onToggleDone,
     required this.onRemove,
     required this.onToggleFavorite,
+    required this.onOpenDetails,
     this.showMoveToOpen = false,
     this.onMoveToOpen,
   });
@@ -34,6 +35,7 @@ class ListScreen extends StatelessWidget {
         final e = entries[i];
 
         return ListTile(
+          onTap: () => onOpenDetails(e),
           leading: Checkbox(
             value: e.isDone,
             onChanged: (_) => onToggleDone(e.id),
