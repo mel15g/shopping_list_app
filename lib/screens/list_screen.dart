@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/list_entry.dart';
 
-
 class ListScreen extends StatelessWidget {
   final List<ListEntry> entries;
   final void Function(String id) onToggleDone;
@@ -18,24 +17,46 @@ class ListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
       return const Center(
-        child: Text('Keine Einträge in dieser Ansicht.'),
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'Keine Einträge in dieser Ansicht.\nTippe unten auf + um etwas hinzuzufügen.',
+            textAlign: TextAlign.center,
+          ),
+        ),
       );
     }
 
     return ListView.builder(
+      padding: const EdgeInsets.only(top: 8, bottom: 80),
       itemCount: entries.length,
       itemBuilder: (context, i) {
         final e = entries[i];
 
-        return ListTile(
-          leading: Checkbox(
-            value: e.isDone,
-            onChanged: (_) => onToggleDone(e.id),
-          ),
-          title: Text('${e.title} (${e.quantity}x)'),
-          trailing: IconButton(
-            onPressed: () => onRemove(e.id),
-            icon: const Icon(Icons.delete),
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          elevation: 1,
+          child: ListTile(
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            leading: Checkbox(
+              value: e.isDone,
+              onChanged: (_) => onToggleDone(e.id),
+            ),
+            title: Text(
+              e.title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                decoration: e.isDone ? TextDecoration.lineThrough : null,
+              ),
+            ),
+            subtitle: Text('Menge: ${e.quantity}'),
+            trailing: IconButton(
+              tooltip: 'Löschen',
+              onPressed: () => onRemove(e.id),
+              icon: const Icon(Icons.delete_outline),
+            ),
           ),
         );
       },

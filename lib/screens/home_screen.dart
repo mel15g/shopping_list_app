@@ -59,19 +59,28 @@ class _HomeScreenState extends State<HomeScreen> {
     final shownItems = _index == 0 ? openItems : doneItems;
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+
+      appBar: AppBar(
+        title: Text(title),
+        centerTitle: true,
+      ),
+
       body: ListScreen(
         entries: shownItems,
         onToggleDone: _toggleDone,
         onRemove: _removeEntry,
       ),
+
       floatingActionButton: _index == 0
           ? FloatingActionButton(
               onPressed: _openAddItem,
               child: const Icon(Icons.add),
             )
           : null,
+
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
         items: const [
