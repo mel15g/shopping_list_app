@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// AddItemScreen dient zum Anlegen eines neuen Produkts.
+// -> StatefulWidget, da Benutzereingaben (Textfelder & Switch) den Zustand des Screens verändern.
 class AddItemScreen extends StatefulWidget {
   const AddItemScreen({super.key});
 
@@ -8,76 +10,136 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
-  final _titleController = TextEditingController();
-  int _quantity = 1;
+  // Controller für den Produktnamen
+  final _titleCtrl = TextEditingController();
+
+  // Controller für die Menge -> Standardwert = 1
+  final _qtyCtrl = TextEditingController(text: '1');
+
+  // Status, ob das Produkt direkt als Favorit gespeichert wird
+  bool _isFavorite = false;
 
   @override
   void dispose() {
-    _titleController.dispose();
+    // Controller immer freigeben -> Best Practice
+    _titleCtrl.dispose();
+    _qtyCtrl.dispose();
     super.dispose();
   }
 
+  // Speichert das neue Produkt: liest Eingaben aus, validiert Basiswerte und gibt Daten als Map an den HomeScreen zurück
   void _save() {
-    final title = _titleController.text.trim();
+    final title = _titleCtrl.text.trim();
+    final qty = int.tryParse(_qtyCtrl.text.trim()) ?? 1;
 
-    if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Bitte Produktnamen eingeben')),
-      );
-      return;
-    }
+    // Ein Produkt ohne Namen wird nicht gespeichert
+    if (title.isEmpty) return;
 
+    // Rückgabe der Daten an den vorherigen Screen
     Navigator.of(context).pop({
       'title': title,
-      'quantity': _quantity,
+      'quantity': qty,
+      'isFavorite': _isFavorite,
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Einheitlicher Hintergrund (pinkes Design)
+      backgroundColor: const Color(0xFFFFF4F7),
+
+      // AppBar mit Icon + Titel, mittig ausgerichtet
       appBar: AppBar(
-        title: const Text('Produkt hinzufügen'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Produktname',
-                border: OutlineInputBorder(),
+        backgroundColor: Colors.pink.shade50,
+        elevation: 0,
+        centerTitle: true,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.add_shopping_cart, color: Colors.pink),
+            SizedBox(width: 8),
+            Text(
+              'Neues Produkt',
+              style: TextStyle(
+                color: Colors.pink,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
+          ],
+        ),
+      ),
+
+      // Inhalt des Screens
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Menge'),
-                const Spacer(),
-                IconButton(
-                  onPressed: _quantity > 1
-                      ? () => setState(() => _quantity--)
-                      : null,
-                  icon: const Icon(Icons.remove),
+                // Eingabe: Produktname
+                TextField(
+                  controller: _titleCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Produktname',
+                  ),
                 ),
-                Text(
-                  '$_quantity',
-                  style: const TextStyle(fontSize: 18),
+
+                const SizedBox(height: 12),
+
+                // Eingabe: Menge
+                TextField(
+                  controller: _qtyCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Menge',
+                  ),
                 ),
-                IconButton(
-                  onPressed: () => setState(() => _quantity++),
-                  icon: const Icon(Icons.add),
+
+                const SizedBox(height: 8),
+
+                // Option: direkt als Favorit speichern
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: _isFavorite,
+                  activeColor: Colors.pink,
+                  title: const Text(
+                    'Direkt als Favorit speichern',
+                  ),
+                  onChanged: (v) =>
+                      setState(() => _isFavorite = v),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Speichern-Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _save,
+                    icon: const Icon(Icons.save),
+                    label: const Text('Speichern'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const Spacer(),
-            ElevatedButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.save),
-              label: const Text('Speichern'),
-            ),
-          ],
+          ),
         ),
       ),
     );

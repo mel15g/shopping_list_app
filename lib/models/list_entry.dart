@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 
-@immutable
+@immutable // Objekt wird nicht direkt verändert
 class ListEntry {
-  final String id;
-  final String title;
-  final int quantity;
-  final bool isDone;
-  final bool isFavorite;
+  final String id;        // eindeutige ID
+  final String title;     // Produktname
+  final int quantity;     // Menge
+  final bool isDone;      // erledigt / offen
+  final bool isFavorite;  // Favorit oder nicht
 
   const ListEntry({
     required this.id,
@@ -16,6 +16,7 @@ class ListEntry {
     this.isFavorite = false,
   });
 
+  // Erstellt eine neue Kopie mit geänderten Werten
   ListEntry copyWith({
     String? id,
     String? title,
